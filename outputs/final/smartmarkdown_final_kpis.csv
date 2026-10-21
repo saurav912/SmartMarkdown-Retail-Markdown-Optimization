@@ -1,0 +1,11 @@
+KPI,Value
+Demand Model Test MAE,7.0
+Demand Model Test RMSE,9.76
+Demand Model Test WAPE (%),17.05
+Demand Model Test R2,0.737
+Adaptive 95% Interval Coverage (%),93.17
+Backtest Actionable Decisions,585.0
+No-Replenishment Backtest Decisions,490.0
+Primary Simulated Profit Difference (%),3.93
+Primary Simulated Profit Difference,580516.91
+Full Backtest Simulated Profit Difference (%),5.44

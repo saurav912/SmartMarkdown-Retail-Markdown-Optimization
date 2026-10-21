@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101d36">
+  <meta name="description" content="SmartMarkdown helps retailers forecast demand, understand product behaviour and compare inventory-aware markdown decisions.">
+  <title>SmartMarkdown | Retail Intelligence</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="{{ url_for('index') }}" aria-label="SmartMarkdown home">
+      <span class="brand-mark">S</span>
+      <span>SmartMarkdown<small>RETAIL INTELLIGENCE</small></span>
+    </a>
+    <nav class="top-nav" aria-label="Main navigation">
+      <a class="active" aria-current="page" href="{{ url_for('index') }}">Overview</a>
+      <a href="{{ url_for('clusters') }}">Clusters</a>
+      <a href="{{ url_for('recommendations') }}">Recommendations</a>
+    </nav>
+  </div>
+</header>
+
+<main class="dashboard page-wrap">
+  {% if startup_error %}
+  <div class="alert error">
+    <strong>Some project data could not be loaded.</strong><br>
+    {{ startup_error }}
+    <p class="foot">Check that the model files, raw data, processed data and clustering files are in the expected project folders.</p>
+  </div>
+  {% endif %}
+
+  <section class="hero-banner">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-copy">
+      <div class="hero-eyebrow"><span></span> DATA-DRIVEN PRICING FOR RETAIL</div>
+      <h1>Turn inventory into <span>opportunity.</span></h1>
+      <p>Forecast demand, understand product behaviour and make smarter markdown decisions — so every product finds the right price at the right time.</p>
+      <div class="hero-pills" aria-label="SmartMarkdown capabilities">
+        <span><span class="pill-symbol symbol-chart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 6-7"/><path d="M16 6h4v4"/></svg></span> Forecast demand</span>
+        <span><span class="pill-symbol symbol-people"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Understand products</span>
+        <span><span class="pill-symbol symbol-tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3H4a1 1 0 0 0-1 1v5.59A2 2 0 0 0 3.59 11l9.58 9.59a2 2 0 0 0 2.83 0l4.59-4.59a2 2 0 0 0 0-2.59Z"/><circle cx="7.5" cy="7.5" r="1"/></svg></span> Optimise markdowns</span>
+      </div>
+      <div class="hero-actions">
+        <a class="btn hero-primary" href="{{ url_for('recommendations') }}">Generate a markdown recommendation <span class="hero-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        <a class="btn hero-secondary" href="{{ url_for('clusters') }}"><span class="hero-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/><path d="M12 13v8"/></svg></span> Explore product groups</a>
+      </div>
+    </div>
+    <div class="hero-photo" role="img" aria-label="Retail clothing display with sale signage" aria-hidden="true"></div>
+    <div class="hero-shade" aria-hidden="true"></div>
+    <div class="hero-decoration" aria-hidden="true"><i></i><i></i><i></i></div>
+  </section>
+
+  <section class="stat-grid" aria-label="Retail data at a glance">
+    <article class="stat-card">
+      <div class="stat-icon blue"><span class="stat-svg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="M3 8v9l9 5 9-5V8M12 13v9"/></svg></span></div>
+      <div class="stat-content"><div class="stat-top">Products analysed</div><div class="stat-value">{{ sku_count }}</div><div class="stat-note">Individual products in our catalogue</div></div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-icon purple"><span class="stat-svg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7"/><path d="M2 20h20"/></svg></span></div>
+      <div class="stat-content"><div class="stat-top">Weekly sales records</div><div class="stat-value">{{ "{:,}".format(record_count) }}</div><div class="stat-note">Historical sales and inventory data</div></div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-icon green"><span class="stat-svg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/></svg></span></div>
+      <div class="stat-content"><div class="stat-top">Product behaviour groups</div><div class="stat-value">{{ cluster_count }}</div><div class="stat-note">Groups based on buying patterns</div></div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-icon amber"><span class="stat-svg"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M8 14h2m4 0h2M8 17h2"/></svg></span></div>
+      <div class="stat-content"><div class="stat-top">Data updated through</div><div class="stat-value date-value">{{ latest_week }}</div><div class="stat-note">Most recent available week</div></div>
+    </article>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="panel behaviour-panel">
+      <div class="panel-heading">
+        <div class="heading-with-icon"><span class="heading-icon blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7"/><path d="M2 20h20"/></svg></span><div><h2>How our products behave</h2><p>Distribution of products across behaviour groups</p></div></div>
+        <span class="panel-tag">{{ cluster_count }} groups</span>
+      </div>
+      {% if cluster_stats %}
+      <div class="cluster-list">
+        {% for c in cluster_stats %}
+        <a class="cluster-row" href="{{ url_for('clusters') }}" aria-label="Explore {{ c.label }} products">
+          <span class="cluster-dot dot-{{ loop.index0 % 3 }}"></span>
+          <span class="cluster-info">
+            <span class="cluster-name">{{ c.label }}</span>
+            <span class="cluster-desc">{{ c.count }} products · {{ c.share }}% of catalogue</span>
+          </span>
+          <span class="cluster-bar"><span class="bar-fill fill-{{ loop.index0 % 3 }}" style="width:{{ c.share }}%"></span></span>
+          <strong class="cluster-share">{{ c.share }}%</strong>
+        </a>
+        {% endfor %}
+      </div>
+      <p class="foot segment-footnote">These groups describe historical product behaviour, not guaranteed future sales.</p>
+      {% else %}
+      <p class="empty-state">Product groups are unavailable. Check the saved product-group mapping file.</p>
+      {% endif %}
+    </article>
+
+    <article class="panel action-panel">
+      <div class="panel-heading">
+        <div class="heading-with-icon"><span class="heading-icon lightning"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-3 8h7l-6 12 1-9H5l8-11Z"/></svg></span><div><h2>Quick actions</h2><p>Move from insight to a pricing decision</p></div></div>
+      </div>
+      <a class="action-card action-blue" href="{{ url_for('recommendations') }}">
+        <span class="action-icon blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3H4a1 1 0 0 0-1 1v5.59A2 2 0 0 0 3.59 11l9.58 9.59a2 2 0 0 0 2.83 0l4.59-4.59a2 2 0 0 0 0-2.59Z"/><circle cx="7.5" cy="7.5" r="1"/></svg></span>
+        <span class="action-copy"><strong>Markdown recommendation</strong><small>Forecast next week's demand and compare discount scenarios for a product.</small></span>
+        <b class="action-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></b>
+      </a>
+      <a class="action-card action-purple" href="{{ url_for('clusters') }}">
+        <span class="action-icon purple"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/><path d="M12 13v8"/></svg></span>
+        <span class="action-copy"><strong>Product group analysis</strong><small>Explore product groups, assignments and behaviour patterns.</small></span>
+        <b class="action-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></b>
+      </a>
+    </article>
+  </section>
+
+  <section class="insight-strip">
+    <div class="insight-heading"><span class="insight-target"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><path d="m15 9 6-6"/></svg></span><h2>From insight to action</h2><p>Everything you need to make smarter retail pricing decisions.</p></div>
+    <div class="insight-grid">
+      <article class="insight-card insight-blue"><span class="insight-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 6-7"/><path d="M16 6h4v4"/></svg></span><div><h3>Forecast demand</h3><p>Predict upcoming demand using historical product data and machine learning.</p></div></article>
+      <article class="insight-card insight-purple"><span class="insight-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/><path d="M12 13v8"/></svg></span><div><h3>Understand products</h3><p>See how different products behave and which groups may respond differently.</p></div></article>
+      <article class="insight-card insight-green"><span class="insight-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3H4a1 1 0 0 0-1 1v5.59A2 2 0 0 0 3.59 11l9.58 9.59a2 2 0 0 0 2.83 0l4.59-4.59a2 2 0 0 0 0-2.59Z"/><circle cx="7.5" cy="7.5" r="1"/></svg></span><div><h3>Optimise markdowns</h3><p>Compare discount options against sell-through and profitability goals.</p></div></article>
+    </div>
+  </section>
+
+  <footer class="footer">SmartMarkdown <span>·</span> Demand forecasting and markdown decision support</footer>
+</main>
+</body>
+</html>

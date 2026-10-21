@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SmartMarkdown | Markdown Recommendations</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body data-recommended-discount="{{ recommendation.Recommended_Discount if recommendation else '' }}">
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">S</span><span>SmartMarkdown<small>RETAIL INTELLIGENCE</small></span></a>
+    <nav class="top-nav">
+      <a href="{{ url_for('index') }}">Overview</a>
+      <a href="{{ url_for('clusters') }}">Clusters</a>
+      <a class="active" href="{{ url_for('recommendations') }}">Recommendations</a>
+    </nav>
+  </div>
+</header>
+<main class="page-wrap recommendation-page">
+  {% if startup_error %}<div class="alert error"><strong>Could not load project artifacts.</strong><br>{{ startup_error }}</div>{% endif %}
+  {% if error %}<div class="alert error"><strong>Recommendation could not be generated.</strong><br>{{ error }}</div>{% endif %}
+
+  <section class="recommendation-hero pricing-hero">
+    <div class="recommendation-hero-copy">
+      <div class="eyebrow">SMART PRICING STUDIO <span class="hero-live-dot"></span> DECISION SUPPORT</div>
+      <h1>Find the balance<br>between <span>sell-through</span><br>and profit.</h1>
+      <p>Explore discount scenarios side by side, understand the trade-offs, and choose a recommendation grounded in your saved demand model.</p>
+      <div class="hero-actions">
+        <a class="hero-primary-action" href="#scenario-form">Build a pricing scenario <span>↓</span></a>
+        <span class="hero-proof"><i></i> Model-backed estimates</span>
+      </div>
+    </div>
+    <div class="pricing-hero-visual" aria-label="Illustration of the pricing trade-off">
+      <div class="hero-chart-caption"><span>PRICE / DEMAND CURVE</span><b>SCENARIO VIEW</b></div>
+      <svg class="hero-sparkline" viewBox="0 0 360 150" role="img" aria-label="Illustrative curve showing demand response as discount changes">
+        <defs><linearGradient id="heroArea" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#83aaff" stop-opacity=".34"/><stop offset="100%" stop-color="#83aaff" stop-opacity="0"/></linearGradient></defs>
+        <path d="M10 125 C48 120 52 96 88 101 S135 83 166 75 S215 77 242 48 S302 43 350 15 L350 145 L10 145 Z" fill="url(#heroArea)"/>
+        <path d="M10 125 C48 120 52 96 88 101 S135 83 166 75 S215 77 242 48 S302 43 350 15" fill="none" stroke="#8fb3ff" stroke-width="3.5" stroke-linecap="round"/>
+        <g fill="#dce8ff" stroke="#31558f" stroke-width="3"><circle cx="88" cy="101" r="5"/><circle cx="166" cy="75" r="5"/><circle cx="242" cy="48" r="5"/><circle cx="350" cy="15" r="5"/></g>
+        <path d="M10 145 H350 M10 105 H350 M10 65 H350 M10 25 H350" stroke="#dce8ff" stroke-opacity=".12" stroke-dasharray="3 6"/>
+      </svg>
+      <div class="hero-visual-foot"><span><i class="hero-key-blue"></i> Discount scenario</span><span>Demand response · illustrative</span></div>
+      <div class="hero-floating-note"><small>DECISION GOAL</small><strong>Profit + sell-through</strong><span>Find a feasible balance</span></div>
+    </div>
+  </section>
+
+  <div class="recommendation-layout">
+    <section class="panel input-panel" id="scenario-form">
+      <div class="input-panel-heading"><div class="eyebrow">STEP 01</div><h2>Configure the decision</h2><p>Choose the product and target week, then fine-tune assumptions if needed.</p></div>
+      <form method="post" class="recommendation-form">
+        <div class="field-group">
+          <label for="sku_id">Product SKU <span class="required-mark">Required</span></label>
+          <select id="sku_id" name="sku_id" required>
+            {% for sku in skus %}<option value="{{ sku }}" {% if form.sku_id == sku %}selected{% endif %}>{{ sku }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="target_week">Target week <span class="required-mark">Monday</span></label>
+          <input id="target_week" type="date" name="target_week" value="{{ form.target_week }}" required>
+          <div class="field-hint">The target must be exactly 7 days after a recorded decision week.</div>
+        </div>
+        <div class="form-section-label"><span>Fine-tune your scenario</span><i></i></div>
+        <div class="field-group">
+          <label for="current_discount">Current discount <span class="unit-label">%</span></label>
+          <input id="current_discount" type="number" name="current_discount" min="0" max="100" step="any" placeholder="Use recorded value" value="{{ form.current_discount }}">
+        </div>
+        <div class="field-group">
+          <label for="closing_inventory">Closing inventory <span class="unit-label">units</span></label>
+          <input id="closing_inventory" type="number" name="closing_inventory" min="0" step="any" placeholder="Use recorded value" value="{{ form.closing_inventory }}">
+        </div>
+        <div class="field-group">
+          <label for="competitor_price">Competitor price <span class="unit-label">₹</span></label>
+          <input id="competitor_price" type="number" name="competitor_price" min="0.01" step="any" placeholder="Use recorded value" value="{{ form.competitor_price }}">
+        </div>
+        <div class="field-group">
+          <label for="event_override">Retail event <span class="unit-label">optional</span></label>
+          <input id="event_override" type="text" name="event_override" placeholder="e.g. Festival Sale" value="{{ form.event_override }}">
+        </div>
+        <div class="checkline festival-check">
+          <input id="festival_override" type="checkbox" name="festival_override" value="yes" {% if form.festival_override %}checked{% endif %}>
+          <label for="festival_override">Override festival flag to Yes</label>
+        </div>
+        <div class="field-group">
+          <label for="season_override">Season <span class="unit-label">optional</span></label>
+          <input id="season_override" type="text" name="season_override" placeholder="e.g. Winter" value="{{ form.season_override }}">
+        </div>
+        <div class="input-help"><span class="note-icon">i</span><p><strong>A quick guide to these settings</strong><br>Leave a field blank to use the available product information. Enter a value only when you want to explore a different scenario. Any value you enter will be used for this recommendation only.</p></div>
+        <button class="btn submit-recommendation" type="submit"><span>Generate recommendation</span><b>→</b></button>
+      </form>
+    </section>
+
+    <section class="recommendation-results">
+      {% if recommendation %}
+        <div class="result-banner">
+          <div class="result-banner-top"><span class="result-status"><i></i> RECOMMENDATION GENERATED</span><span class="result-week">TARGET WEEK · {{ recommendation.Target_Week }}</span></div>
+          <div class="result-main">
+            <div><div class="result-overline">Recommended markdown for {{ recommendation.SKU_ID }}</div><div class="recommended-discount">{{ fmt_pct(recommendation.Recommended_Discount) }}<small> discount</small></div><p>{{ recommendation.Reason }}</p></div>
+            <div class="result-badge"><span>PRICE</span><strong>↓</strong><span>SMART</span></div>
+          </div>
+          {% if cluster_info %}<div class="result-segment"><span class="segment-mini-icon">◇</span><div><small>PRODUCT BEHAVIOUR SEGMENT · CLUSTER {{ cluster_info.Cluster }}</small><strong>{{ cluster_info.Cluster_Label }}</strong></div></div>{% endif %}
+        </div>
+
+        <div class="result-section-heading"><div><div class="eyebrow">THE EXPECTED OUTCOME</div><h2>Decision snapshot</h2></div><span class="section-note">Model-based estimates</span></div>
+        <div class="result-metric-grid">
+          <article class="result-metric metric-blue"><div class="result-metric-top"><span>Baseline demand</span><i>↗</i></div><strong>{{ fmt_num(recommendation.Baseline_Demand) }}</strong><small>Units before markdown adjustment</small></article>
+          <article class="result-metric metric-green"><div class="result-metric-top"><span>Projected sell-through</span><i>◉</i></div><strong>{{ fmt_pct(recommendation.Projected_Sell_Through_Pct) }}</strong><small>Decision target: 45%</small></article>
+          <article class="result-metric metric-purple"><div class="result-metric-top"><span>Expected gross profit</span><i>₹</i></div><strong>{{ fmt_money(recommendation.Expected_Gross_Profit) }}</strong><small>Estimated for the scenario</small></article>
+          <article class="result-metric metric-amber"><div class="result-metric-top"><span>Expected margin</span><i>％</i></div><strong>{{ fmt_pct(recommendation.Margin_Pct) }}</strong><small>Margin after recommended discount</small></article>
+          <article class="result-metric metric-blue"><div class="result-metric-top"><span>Expected units sold</span><i>▥</i></div><strong>{{ fmt_num(recommendation.Expected_Units_Sold) if recommendation.Expected_Units_Sold is defined else '—' }}</strong><small>Demand adjusted for the scenario</small></article>
+          <article class="result-metric metric-rose"><div class="result-metric-top"><span>Leftover inventory</span><i>□</i></div><strong>{{ fmt_num(recommendation.Expected_Leftover_Inventory) }}</strong><small>Estimated units remaining</small></article>
+        </div>
+
+        {% if scenarios %}
+        <section class="panel scenario-panel">
+          <div class="scenario-heading"><div><div class="eyebrow">COMPARE BEFORE YOU COMMIT</div><h2>Discount impact explorer</h2><p>Switch between metrics to see how each candidate discount changes the expected outcome.</p></div><span class="scenario-count">{{ scenarios|length }} scenarios</span></div>
+          <div class="scenario-chart-card">
+            <div class="scenario-chart-top">
+              <div><span class="chart-kicker">SCENARIO COMPARISON</span><strong id="scenario-chart-title">Projected sell-through</strong></div>
+              <div class="chart-metric-switch" role="group" aria-label="Choose chart metric">
+                <button type="button" class="chart-metric-btn active" data-metric="sellthrough">Sell-through</button>
+                <button type="button" class="chart-metric-btn" data-metric="profit">Gross profit</button>
+                <button type="button" class="chart-metric-btn" data-metric="margin">Margin</button>
+                <button type="button" class="chart-metric-btn" data-metric="demand">Demand</button>
+              </div>
+            </div>
+            <div class="scenario-chart-wrap">
+              <svg id="scenario-chart" class="scenario-chart" viewBox="0 0 760 270" role="img" aria-label="Interactive chart comparing discount scenarios"></svg>
+              <div id="scenario-chart-tooltip" class="scenario-chart-tooltip" aria-live="polite">Select a point to inspect its scenario.</div>
+            </div>
+            <div class="chart-legend"><span><i class="legend-dot recommended-dot"></i>Recommended discount</span><span><i class="legend-dot feasible-dot"></i>Feasible scenario</span><span><i class="legend-dot infeasible-dot"></i>Not feasible</span></div>
+          </div>
+          <details class="scenario-data-details">
+            <summary>View exact scenario figures <span>Expand table</span></summary>
+            <div class="table-wrap"><table class="scenario-table"><thead><tr><th>Discount</th><th>Adjusted demand</th><th>Sell-through</th><th>Gross profit</th><th>Margin</th><th>Status</th></tr></thead><tbody>
+          {% for row in scenarios %}
+            <tr class="{% if recommendation.Recommended_Discount is not none and row.Candidate_Discount == recommendation.Recommended_Discount %}selected-scenario{% endif %}">
+              <td><strong>{{ fmt_pct(row.Candidate_Discount) }}</strong>{% if recommendation.Recommended_Discount is not none and row.Candidate_Discount == recommendation.Recommended_Discount %}<span class="chosen-tag">Recommended</span>{% endif %}</td>
+              <td>{{ fmt_num(row.Adjusted_Demand) }}</td><td>{{ fmt_pct(row.Projected_Sell_Through_Pct) }}</td><td>{{ fmt_money(row.Gross_Profit) }}</td><td>{{ fmt_pct(row.Margin_Pct) }}</td>
+              <td><span class="feasible-pill {% if row.Feasible %}is-feasible{% else %}not-feasible{% endif %}">{{ 'Feasible' if row.Feasible else 'Not feasible' }}</span></td>
+            </tr>
+          {% endfor %}
+          </tbody></table></div>
+          </details>
+          <div class="scenario-foot"><span class="note-icon">i</span><p>Price response is estimated from historical associations. These are scenario comparisons, not proof that a discount will cause a particular sales outcome. Feasibility follows the existing decision engine's rules.</p></div>
+        </section>
+        {% endif %}
+      {% else %}
+        <div class="empty-results panel">
+          <div class="empty-illustration"><div class="empty-orbit"></div><div class="empty-icon">₹<span>↗</span></div></div>
+          <div class="eyebrow">YOUR DECISION WORKSPACE</div><h2>Ready to find the right markdown?</h2>
+          <p>Select a SKU and target week, then generate a recommendation. Your results will appear here with a demand forecast, expected business outcomes and a comparison of discount scenarios.</p>
+          <div class="empty-steps"><div><span>01</span><strong>Choose a product</strong><small>Pick a tracked SKU</small></div><div><span>02</span><strong>Set the week</strong><small>Use a valid target Monday</small></div><div><span>03</span><strong>Compare scenarios</strong><small>Review the recommendation</small></div></div>
+          <div class="empty-foot"><span class="note-icon">i</span><p>The application uses the existing saved demand model and artifacts. It does not retrain the model when you generate a recommendation.</p></div>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+  <footer class="footer">SmartMarkdown <span>·</span> Demand forecasting and markdown decision support <span>·</span> Prototype estimates should be reviewed before operational use</footer>
+</main>
+<script>
+(() => {
+  const rawScenarios = {{ scenarios|tojson }};
+  const recommendedRaw = document.body.dataset.recommendedDiscount;
+  const svg = document.getElementById("scenario-chart");
+  if (!svg || !Array.isArray(rawScenarios) || !rawScenarios.length) return;
+
+  const metricConfig = {
+    sellthrough: { key: "Projected_Sell_Through_Pct", title: "Projected sell-through", format: v => `${Number(v).toFixed(2)}%` },
+    profit: { key: "Gross_Profit", title: "Expected gross profit", format: v => `₹${Number(v).toLocaleString("en-IN", {maximumFractionDigits: 0})}` },
+    margin: { key: "Margin_Pct", title: "Expected margin", format: v => `${Number(v).toFixed(2)}%` },
+    demand: { key: "Adjusted_Demand", title: "Adjusted demand", format: v => `${Number(v).toFixed(2)} units` }
+  };
+  const recommendedDiscount = recommendedRaw !== "" && Number.isFinite(Number(recommendedRaw))
+    ? Number(recommendedRaw) : null;
+  const rows = rawScenarios.map((r, i) => ({
+    ...r,
+    _discount: Number(r.Candidate_Discount),
+    _feasible: r.Feasible === true || String(r.Feasible).toLowerCase() === "true",
+    _index: i
+  })).filter(r => Number.isFinite(r._discount));
+
+  const ns = "http://www.w3.org/2000/svg";
+  const tooltip = document.getElementById("scenario-chart-tooltip");
+  const title = document.getElementById("scenario-chart-title");
+  const buttons = Array.from(document.querySelectorAll(".chart-metric-btn"));
+  let currentMetric = "sellthrough";
+  let selectedDiscount = recommendedDiscount;
+
+  function el(tag, attrs = {}, textContent = null) {
+    const node = document.createElementNS(ns, tag);
+    Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, String(value)));
+    if (textContent !== null) node.textContent = textContent;
+    return node;
+  }
+  function render(metricName) {
+    currentMetric = metricName;
+    const config = metricConfig[metricName] || metricConfig.sellthrough;
+    title.textContent = config.title;
+    buttons.forEach(btn => {
+      const active = btn.dataset.metric === metricName;
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+    svg.replaceChildren();
+    const defs = el("defs");
+    const chartGradient = el("linearGradient", {id:"scenarioArea", x1:"0", x2:"0", y1:"0", y2:"1"});
+    chartGradient.appendChild(el("stop", {offset:"0%", "stop-color":"#416fe0", "stop-opacity":".18"}));
+    chartGradient.appendChild(el("stop", {offset:"100%", "stop-color":"#416fe0", "stop-opacity":"0"}));
+    defs.appendChild(chartGradient);
+    svg.appendChild(defs);
+    const values = rows.map(r => Number(r[config.key])).filter(Number.isFinite);
+    if (!values.length) {
+      svg.appendChild(el("text", {x:380,y:135,"text-anchor":"middle",class:"chart-empty-text"},"No values available for this metric."));
+      return;
+    }
+    const W=760,H=270,left=64,right=24,top=22,bottom=48;
+    const minRaw=Math.min(...values), maxRaw=Math.max(...values);
+    const span=maxRaw-minRaw || Math.max(Math.abs(maxRaw)*0.1,1);
+    const min=minRaw-span*0.12, max=maxRaw+span*0.12;
+    const x=i => left+(rows.length===1?0.5:i/(rows.length-1))*(W-left-right);
+    const y=v => top+(max-v)/(max-min)*(H-top-bottom);
+    for(let i=0;i<5;i++){
+      const val=min+(max-min)*i/4, yy=y(val);
+      svg.appendChild(el("line",{x1:left,y1:yy,x2:W-right,y2:yy,class:"chart-grid-line"}));
+      let label;
+      if(metricName==="profit") label="₹"+Math.round(val).toLocaleString("en-IN");
+      else if(metricName==="sellthrough"||metricName==="margin") label=val.toFixed(1)+"%";
+      else label=val.toFixed(1);
+      svg.appendChild(el("text",{x:left-10,y:yy+4,"text-anchor":"end",class:"chart-axis-label"},label));
+    }
+    const points=rows.map((r,i)=>({r,x:x(i),y:y(Number(r[config.key])),v:Number(r[config.key])})).filter(p=>Number.isFinite(p.v));
+    if(points.length>1){
+      const areaD=`M ${points[0].x} ${H-bottom} `+points.map(p=>`L ${p.x} ${p.y}`).join(" ")+` L ${points[points.length-1].x} ${H-bottom} Z`;
+      svg.appendChild(el("path",{d:areaD,class:"chart-area"}));
+      svg.appendChild(el("polyline",{points:points.map(p=>`${p.x},${p.y}`).join(" "),class:"chart-line"}));
+    }
+    points.forEach((p,i)=>{
+      const isRecommended=recommendedDiscount!==null && Math.abs(p.r._discount-recommendedDiscount)<0.0001;
+      const isSelected=selectedDiscount!==null && Math.abs(p.r._discount-selectedDiscount)<0.0001;
+      const group=el("g",{class:"chart-point-group",tabindex:"0",role:"button","aria-label":`${p.r._discount}% discount, ${config.format(p.v)}, ${p.r._feasible?"feasible":"not feasible"}`});
+      if(isSelected) group.appendChild(el("circle",{cx:p.x,cy:p.y,r:11,class:"chart-selection-ring"}));
+      group.appendChild(el("circle",{cx:p.x,cy:p.y,r:isRecommended?6.5:4.5,class:`chart-point ${p.r._feasible?"point-feasible":"point-infeasible"} ${isRecommended?"point-recommended":""}`}));
+      const showLabel = points.length<=12 || i===0 || i===points.length-1 || isRecommended;
+      if(showLabel) group.appendChild(el("text",{x:p.x,y:H-bottom+22,"text-anchor":"middle",class:`chart-x-label ${isRecommended?"chart-x-recommended":""}`},`${p.r._discount}%`));
+      const inspect=()=>{
+        selectedDiscount=p.r._discount;
+        svg.querySelectorAll(".chart-selection-ring").forEach(n=>n.remove());
+        svg.querySelectorAll(".chart-point-group").forEach(n=>n.classList.remove("point-current"));
+        group.classList.add("point-current");
+        group.insertBefore(el("circle",{cx:p.x,cy:p.y,r:11,class:"chart-selection-ring"}),group.firstChild);
+        tooltip.innerHTML="";
+        const strong=document.createElement("strong"); strong.textContent=`${p.r._discount}% discount`; tooltip.appendChild(strong);
+        const line=document.createElement("span"); line.textContent=`${config.title}: ${config.format(p.v)} · ${p.r._feasible?"Feasible":"Not feasible"}`; tooltip.appendChild(line);
+        const extra=document.createElement("small");
+        extra.textContent=`Gross profit ${metricConfig.profit.format(Number(p.r.Gross_Profit)||0)} · Sell-through ${metricConfig.sellthrough.format(Number(p.r.Projected_Sell_Through_Pct)||0)}`;
+        tooltip.appendChild(extra);
+      };
+      group.addEventListener("click",inspect);
+      group.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();inspect();}});
+      svg.appendChild(group);
+    });
+    svg.appendChild(el("text",{x:left,y:H-8,class:"chart-axis-title"},"DISCOUNT LEVEL"));
+    const initial=points.find(p=>recommendedDiscount!==null&&Math.abs(p.r._discount-recommendedDiscount)<0.0001)||points[0];
+    if(initial){
+      selectedDiscount=initial.r._discount;
+      const pointGroup=Array.from(svg.querySelectorAll(".chart-point-group")).find(g=>g.getAttribute("aria-label").startsWith(`${initial.r._discount}% discount`));
+      if(pointGroup) pointGroup.dispatchEvent(new Event("click"));
+    }
+  }
+  buttons.forEach(btn=>btn.addEventListener("click",()=>render(btn.dataset.metric)));
+  render(currentMetric);
+})();
+</script>
+</body>
+</html>

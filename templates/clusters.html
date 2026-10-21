@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SmartMarkdown | Product Explorer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">S</span><span>SmartMarkdown<small>RETAIL INTELLIGENCE</small></span></a>
+    <nav class="top-nav">
+      <a href="{{ url_for('index') }}">Overview</a>
+      <a class="active" href="{{ url_for('clusters') }}">Clusters</a>
+      <a href="{{ url_for('recommendations') }}">Recommendations</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page-wrap cluster-page">
+  {% if startup_error %}<div class="alert error"><strong>Some cluster details may be unavailable.</strong><br>{{ startup_error }}</div>{% endif %}
+
+  <!-- Keep the existing Clusters hero and its visual identity. -->
+  <section class="cluster-hero">
+    <div>
+      <div class="eyebrow">PRODUCT INTELLIGENCE · SEGMENT EXPLORER</div>
+      <h1>Know your products.<br><span>Price with purpose.</span></h1>
+      <p>Explore the behavioural segments behind SmartMarkdown and see how each tracked SKU fits into the retail picture.</p>
+      <div class="hero-pills">
+        <span>✦ 3 behavioural profiles</span>
+        <span>▦ SKU-level exploration</span>
+        <span>↗ Inventory-aware insights</span>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+      <div class="orbit-core">SKU<br><b>IQ</b></div>
+      <span class="orbit-node node-a">↗</span><span class="orbit-node node-b">◈</span><span class="orbit-node node-c">▦</span>
+    </div>
+  </section>
+
+  <section class="cluster-summary-grid" aria-label="Product behaviour groups">
+    {% for c in cluster_stats %}
+    <a class="segment-card {{ c.tone }} {% if selected_cluster == c.id %}segment-selected{% endif %}"
+       href="{{ url_for('clusters', cluster=c.id) }}"
+       data-segment-link="{{ c.id }}">
+      <div class="segment-card-top">
+        <span class="segment-symbol">{% if c.tone == 'blue' %}↗{% elif c.tone == 'purple' %}◌{% else %}◆{% endif %}</span>
+        <span class="segment-id">CLUSTER {{ c.id }}</span>
+      </div>
+      <h2>{{ c.label }}</h2>
+      <div class="segment-number">{{ c.count }} <small>SKUs</small></div>
+      <div class="segment-progress"><span style="width:{{ c.share }}%"></span></div>
+      <div class="segment-foot"><span>{{ c.share }}% of tracked products</span><span>Explore →</span></div>
+      <div class="segment-metrics">
+        <div><small>Avg. units sold / week</small><strong>{% if c.avg_units is not none %}{{ '%.1f'|format(c.avg_units) }}{% else %}—{% endif %}</strong></div>
+        <div><small>Avg. discount</small><strong>{% if c.avg_discount is not none %}{{ '%.1f'|format(c.avg_discount) }}%{% else %}—{% endif %}</strong></div>
+      </div>
+    </a>
+    {% endfor %}
+  </section>
+
+  <section class="cluster-explorer panel" id="product-explorer">
+    <div class="explorer-heading">
+      <div><div class="eyebrow">PRODUCT CATALOGUE</div><h2>Explore your products</h2><p>Search by SKU, category or behaviour, then open a product's markdown recommendation.</p></div>
+      <div class="explorer-count"><strong id="result-count">{{ sku_rows|length }}</strong><span>products</span></div>
+    </div>
+
+    <form class="cluster-filters" id="explorer-filters" method="get" action="{{ url_for('clusters') }}">
+      <div class="filter-field">
+        <label for="cluster">Behaviour segment</label>
+        <select name="cluster" id="cluster">
+          <option value="all" {% if selected_cluster == 'all' %}selected{% endif %}>All segments</option>
+          {% for c in cluster_stats %}<option value="{{ c.id }}" {% if selected_cluster == c.id %}selected{% endif %}>{{ c.label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="filter-field search-field">
+        <label for="q">Search products</label>
+        <input id="q" name="q" value="{{ search }}" placeholder="Try SKU012, Apparel, or High-Demand">
+      </div>
+      <button class="btn filter-btn" type="submit">Apply filters</button>
+      <a class="clear-filter" id="clear-filters" href="{{ url_for('clusters') }}">Reset</a>
+    </form>
+
+    <div class="explorer-toolbar">
+      <p id="result-summary" aria-live="polite">Showing {{ sku_rows|length }} products</p>
+      <div class="view-switch" role="group" aria-label="Choose product view">
+        <button type="button" id="cards-view-btn" class="active" aria-pressed="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Cards
+        </button>
+        <button type="button" id="table-view-btn" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18"/><path d="M8 3v18M16 3v18"/></svg> Table
+        </button>
+      </div>
+    </div>
+
+    <div class="product-card-grid" id="product-card-grid">
+      {% for r in sku_rows %}
+      <a class="product-card tone-{{ r.tone }}" href="{{ url_for('recommendations') }}?sku_id={{ r.sku|urlencode }}"
+         data-sku="{{ r.sku|e }}" data-category="{{ r.category|e }}" data-segment="{{ r.label|e }}" data-cluster="{{ r.cluster|e }}"
+         data-units="{{ r.avg_units if r.avg_units is not none else '' }}" data-discount="{{ r.avg_discount if r.avg_discount is not none else '' }}" data-inventory="{{ r.inventory if r.inventory is not none else '' }}">
+        <div class="product-card-top"><span class="product-sku">{{ r.sku }}</span><span class="product-category">{{ r.category }}</span></div>
+        <div class="product-segment"><i></i><span>{{ r.label }}</span></div>
+        <div class="product-sales"><small>Average units sold / week</small><strong>{% if r.avg_units is not none %}{{ '%.1f'|format(r.avg_units) }}{% else %}—{% endif %} <span>units</span></strong></div>
+        <div class="product-card-metrics">
+          <div><small>Average discount</small><strong>{% if r.avg_discount is not none %}{{ '%.1f'|format(r.avg_discount) }}%{% else %}—{% endif %}</strong></div>
+          <div><small>Latest inventory</small><strong>{% if r.inventory is not none %}{{ '%.0f'|format(r.inventory) }}{% else %}—{% endif %}</strong></div>
+        </div>
+        <div class="product-card-action"><span>View recommendation</span><span aria-hidden="true">↗</span></div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="product-table-view" id="product-table-view" hidden>
+      <div class="table-wrap">
+        <table class="sku-table">
+          <thead><tr>
+            <th>SKU</th><th>Behaviour segment</th><th>Category</th>
+            <th><button type="button" data-sort="units">Avg. units / week ↕</button></th>
+            <th><button type="button" data-sort="discount">Avg. discount ↕</button></th>
+            <th><button type="button" data-sort="inventory">Latest inventory ↕</button></th>
+            <th>Action</th>
+          </tr></thead>
+          <tbody id="sku-table-body">
+          {% for r in sku_rows %}
+            <tr data-sku="{{ r.sku|e }}" data-category="{{ r.category|e }}" data-segment="{{ r.label|e }}" data-cluster="{{ r.cluster|e }}"
+                data-units="{{ r.avg_units if r.avg_units is not none else '' }}" data-discount="{{ r.avg_discount if r.avg_discount is not none else '' }}" data-inventory="{{ r.inventory if r.inventory is not none else '' }}">
+              <td><span class="sku-code">{{ r.sku }}</span></td>
+              <td><span class="segment-pill {{ r.tone }}"><i></i>{{ r.label }}</span></td>
+              <td>{{ r.category }}</td>
+              <td>{% if r.avg_units is not none %}{{ '%.1f'|format(r.avg_units) }}{% else %}—{% endif %}</td>
+              <td>{% if r.avg_discount is not none %}{{ '%.1f'|format(r.avg_discount) }}%{% else %}—{% endif %}</td>
+              <td>{% if r.inventory is not none %}{{ '%.0f'|format(r.inventory) }}{% else %}—{% endif %}</td>
+              <td><a class="table-action" href="{{ url_for('recommendations') }}?sku_id={{ r.sku|urlencode }}" title="View markdown recommendation" aria-label="View recommendation for {{ r.sku }}">↗</a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="explorer-empty" id="explorer-empty">
+      <strong>No products match your search</strong><p>Try another SKU, category, or behaviour group.</p>
+      <button type="button" id="empty-reset">Clear search and filters</button>
+    </div>
+
+    <div class="product-pagination" id="product-pagination">
+      <div class="pagination-summary" id="pagination-summary">Showing 1–8 of {{ sku_rows|length }} products</div>
+      <div class="pagination-controls" id="pagination-controls" aria-label="Product pages"></div>
+    </div>
+
+    <div class="table-foot"><span>Product averages describe historical behaviour; they are not forecasts.</span></div>
+  </section>
+
+  <footer class="footer">SmartMarkdown <span>·</span> Demand forecasting and markdown decision support</footer>
+</main>
+
+<script>
+(() => {
+  const root = document.querySelector('.cluster-page');
+  if (!root) return;
+
+  const searchInput = document.getElementById('q');
+  const clusterSelect = document.getElementById('cluster');
+  const form = document.getElementById('explorer-filters');
+  const cardsGrid = document.getElementById('product-card-grid');
+  const tableView = document.getElementById('product-table-view');
+  const cardButton = document.getElementById('cards-view-btn');
+  const tableButton = document.getElementById('table-view-btn');
+  const emptyState = document.getElementById('explorer-empty');
+  const pagination = document.getElementById('product-pagination');
+  const paginationSummary = document.getElementById('pagination-summary');
+  const paginationControls = document.getElementById('pagination-controls');
+  const resultCount = document.getElementById('result-count');
+  const resultSummary = document.getElementById('result-summary');
+  const clearButton = document.getElementById('clear-filters');
+  const pageSize = 8;
+  let currentPage = 1;
+  let view = 'cards';
+  let sortKey = 'sku';
+  let sortDirection = 1;
+  const cards = Array.from(cardsGrid.querySelectorAll('.product-card'));
+  const tableBody = document.getElementById('sku-table-body');
+  const rows = Array.from(tableBody.querySelectorAll('tr'));
+
+  const norm = value => (value || '').toString().trim().toLowerCase();
+  const valueFor = (el, key) => {
+    if (key === 'sku') return norm(el.dataset.sku);
+    const value = el.dataset[key] ?? '';
+    return value === '' ? null : (['units','discount','inventory'].includes(key) ? Number(value) : norm(value));
+  };
+  const getVisibleItems = () => {
+    const q = norm(searchInput.value);
+    const cluster = clusterSelect.value;
+    const all = view === 'cards' ? cards : rows;
+    return all.filter(el => {
+      const matchesText = !q || [el.dataset.sku, el.dataset.category, el.dataset.segment, `cluster ${el.dataset.cluster}`].some(v => norm(v).includes(q));
+      const matchesCluster = cluster === 'all' || el.dataset.cluster === cluster;
+      return matchesText && matchesCluster;
+    }).sort((a,b) => {
+      const av = valueFor(a, sortKey), bv = valueFor(b, sortKey);
+      if (av === null) return bv === null ? 0 : 1;
+      if (bv === null) return -1;
+      return (typeof av === 'number' ? av - bv : av.localeCompare(bv)) * sortDirection;
+    });
+  };
+  function makePageButton(label, page, active=false, disabled=false) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = label; b.disabled = disabled;
+    if (active) b.classList.add('active');
+    b.setAttribute('aria-label', label === '‹' ? 'Previous page' : label === '›' ? 'Next page' : `Page ${label}`);
+    b.addEventListener('click', () => { currentPage = page; render(); });
+    return b;
+  }
+  function render() {
+    const items = getVisibleItems();
+    const total = items.length;
+    const pages = Math.max(1, Math.ceil(total / pageSize));
+    currentPage = Math.min(currentPage, pages);
+    const start = total ? (currentPage - 1) * pageSize : 0;
+    const end = Math.min(start + pageSize, total);
+    const visibleItems = items.slice(start, end);
+    const visibleSet = new Set(visibleItems);
+    (view === 'cards' ? cards : rows).forEach(el => { el.hidden = !visibleSet.has(el); });
+    resultCount.textContent = total;
+    resultSummary.textContent = total ? `Showing ${start + 1}–${end} of ${total} matching products` : 'No matching products';
+    paginationSummary.textContent = total ? `Showing ${start + 1}–${end} of ${total} products` : 'No products to display';
+    paginationControls.replaceChildren();
+    paginationControls.append(makePageButton('‹', Math.max(1,currentPage-1), false, currentPage===1));
+    for (let p = 1; p <= pages; p++) {
+      if (pages > 7 && p > 2 && p < pages - 1 && Math.abs(p-currentPage) > 1) {
+        if (p === 3 || p === pages - 2) {
+          const ellipsis = document.createElement('span'); ellipsis.textContent = '…'; ellipsis.style.padding = '0 3px'; paginationControls.append(ellipsis);
+        }
+        continue;
+      }
+      paginationControls.append(makePageButton(String(p),p,p===currentPage,false));
+    }
+    paginationControls.append(makePageButton('›', Math.min(pages,currentPage+1), false, currentPage===pages));
+    emptyState.classList.toggle('is-visible', total === 0);
+    pagination.hidden = total === 0;
+    cardsGrid.hidden = view !== 'cards' || total === 0;
+    tableView.hidden = view !== 'table' || total === 0;
+    tableView.classList.toggle('is-visible', view === 'table' && total > 0);
+    cardButton.classList.toggle('active', view === 'cards');
+    tableButton.classList.toggle('active', view === 'table');
+    cardButton.setAttribute('aria-pressed', view === 'cards');
+    tableButton.setAttribute('aria-pressed', view === 'table');
+  }
+  function setView(next) { view = next; currentPage = 1; render(); }
+  cardButton.addEventListener('click', () => setView('cards'));
+  tableButton.addEventListener('click', () => setView('table'));
+  searchInput.addEventListener('input', () => { currentPage = 1; render(); });
+  clusterSelect.addEventListener('change', () => { currentPage = 1; render(); });
+  form.addEventListener('submit', e => { e.preventDefault(); currentPage = 1; render(); });
+  clearButton.addEventListener('click', e => {
+    e.preventDefault(); searchInput.value = ''; clusterSelect.value = 'all'; currentPage = 1; render();
+  });
+  document.getElementById('empty-reset').addEventListener('click', () => {
+    searchInput.value = ''; clusterSelect.value = 'all'; currentPage = 1; render(); searchInput.focus();
+  });
+  root.querySelectorAll('[data-sort]').forEach(button => button.addEventListener('click', () => {
+    const key = button.dataset.sort;
+    if (sortKey === key) sortDirection *= -1; else { sortKey = key; sortDirection = -1; }
+    currentPage = 1; render();
+  }));
+  root.querySelectorAll('[data-segment-link]').forEach(link => {
+    link.addEventListener('click', () => { /* Navigation keeps shareable server-side segment filters. */ });
+  });
+  render();
+})();
+</script>
+</body>
+</html>

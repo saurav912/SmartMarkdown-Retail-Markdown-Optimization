@@ -1,0 +1,41 @@
+SKU_ID,Baseline_Demand,Current_Discount,Recommended_Discount,Projected_Sell_Through_Pct,Expected_Gross_Profit,Profit_Retention_Pct,Margin_Pct,Expected_Leftover_Inventory,Reason,Discount_Change,Decision_Type
+SKU001,67.14646662668648,0,0.0,100.0,1836.0,100.0,57.446808510638306,0.0,Smallest feasible markdown meeting the target sell-through.,0.0,Keep Current Markdown
+SKU002,63.97459219717557,20,0.0,94.90562225970203,27587.166278450182,147.69555357230908,55.95595595595596,2.6490764249549485,Smallest feasible markdown meeting the target sell-through.,-20.0,Reduce Markdown
+SKU003,44.16305515219073,0,15.0,46.07175261032005,41270.937773066864,88.24482928935416,44.678221463673005,63.63533191982234,Smallest feasible markdown meeting the target sell-through.,15.0,Increase Markdown
+SKU004,38.04470110039091,20,0.0,100.0,5396.0,158.85539331135186,53.98159263705482,0.0,Smallest feasible markdown meeting the target sell-through.,-20.0,Reduce Markdown
+SKU005,43.960206800800485,15,0.0,100.0,1530.0,140.68965517241378,51.864406779661024,0.0,Smallest feasible markdown meeting the target sell-through.,-15.0,Reduce Markdown
+SKU006,41.58919898667383,20,0.0,100.0,3660.0,164.568345323741,50.974930362116986,0.0,Smallest feasible markdown meeting the target sell-through.,-20.0,Reduce Markdown
+SKU007,30.75629948853938,0,0.0,100.0,41220.0,100.0,49.89106753812636,0.0,Smallest feasible markdown meeting the target sell-through.,0.0,Keep Current Markdown
+SKU008,29.245012294838183,40,0.0,100.0,1780.0,383.62068965517244,54.1033434650456,0.0,Smallest feasible markdown meeting the target sell-through.,-40.0,Reduce Markdown
+SKU009,46.591895787195355,15,,,0.0,,,0.0,No markdown action - no inventory available.,,No Action - No Inventory
+SKU010,49.193870002931895,25,8.0,47.076453578166216,59145.66994897786,128.0061284615716,46.84513814223757,42.86807260168536,Smallest feasible markdown meeting the target sell-through.,-17.0,Reduce Markdown
+SKU011,47.42156599648239,20,,,0.0,,,0.0,No markdown action - no inventory available.,,No Action - No Inventory
+SKU012,44.04687334112176,25,0.0,100.0,2698.0,186.26164998274078,53.98159263705482,0.0,Smallest feasible markdown meeting the target sell-through.,-25.0,Reduce Markdown
+SKU013,55.8288243621406,10,0.0,100.0,13377.0,121.1871393239901,57.19844357976653,0.0,Smallest feasible markdown meeting the target sell-through.,-10.0,Reduce Markdown
+SKU014,35.667044233361324,20,0.0,66.58639307756854,52662.51242111818,120.11905382409536,55.13003715347242,13.6995788381969,Smallest feasible markdown meeting the target sell-through.,-20.0,Reduce Markdown
+SKU015,37.823124028719995,15,0.0,59.93236847140656,34808.719608192936,106.20918706681148,52.838427947598255,19.23246313372485,Smallest feasible markdown meeting the target sell-through.,-15.0,Reduce Markdown
+SKU016,28.825769238771713,20,0.0,46.54497675944731,28262.109888336407,119.2756680077848,53.01204819277109,24.589310690654237,Smallest feasible markdown meeting the target sell-through.,-20.0,Reduce Markdown
+SKU017,37.37627549584722,15,0.0,100.0,46900.0,146.9528434905217,46.94694694694695,0.0,Smallest feasible markdown meeting the target sell-through.,-15.0,Reduce Markdown
+SKU018,38.259472586182774,20,0.0,61.966169459484796,36343.15838798784,122.41142867124506,51.10220440881763,17.49556204863699,Smallest feasible markdown meeting the target sell-through.,-20.0,Reduce Markdown
+SKU019,38.52049677689906,35,20.0,46.34050923081314,37040.15439022588,160.4354730798237,35.04022613611655,33.26888427689585,Smallest feasible markdown meeting the target sell-through.,-15.0,Reduce Markdown
+SKU020,52.900876661887715,35,8.0,48.22433502346827,21153.508109374314,133.57964031085984,49.69682138292955,31.06539898591904,Smallest feasible markdown meeting the target sell-through.,-27.0,Reduce Markdown
+SKU021,36.92061955945031,10,0.0,100.0,1999.0,125.00781689700457,49.98749687421856,0.0,Smallest feasible markdown meeting the target sell-through.,-10.0,Reduce Markdown
+SKU022,35.4366347375665,15,,,0.0,,,0.0,No markdown action - no inventory available.,,No Action - No Inventory
+SKU023,34.60661330452654,25,,,0.0,,,0.0,No markdown action - no inventory available.,,No Action - No Inventory
+SKU024,38.77153563557985,20,25.0,38.68117105145081,27906.43415214156,90.06081414733615,35.97438975590236,65.61114697494763,No feasible markdown reached the target sell-through; selected the feasible scenario with the highest projected sell-through.,5.0,Increase Markdown
+SKU025,47.889259909004366,0,0.0,100.0,24041.0,100.0,55.3035356904603,0.0,Smallest feasible markdown meeting the target sell-through.,0.0,Keep Current Markdown
+SKU026,10.959906296641652,20,0.0,29.85920952892977,56725.033302584336,143.8010106304592,37.99689984499225,17.535197617767558,No feasible markdown reached the target sell-through; selected the feasible scenario with the highest projected sell-through.,-20.0,Reduce Markdown
+SKU027,22.60342678009051,0,5.0,43.71097536520686,22007.077345169968,97.45914487189708,47.342092098680915,31.521853795484155,No feasible markdown reached the target sell-through; selected the feasible scenario with the highest projected sell-through.,5.0,Increase Markdown
+SKU028,29.655121669817536,0,8.0,45.86113053866278,27321.62176279063,92.2234312103985,45.624986406246606,38.43859731754943,Smallest feasible markdown meeting the target sell-through.,8.0,Increase Markdown
+SKU029,30.189590079670367,30,,,0.0,,,0.0,No markdown action - no inventory available.,,No Action - No Inventory
+SKU030,40.4738759110048,15,0.0,100.0,549.0,137.54227733934613,54.95495495495496,0.0,Smallest feasible markdown meeting the target sell-through.,-15.0,Reduce Markdown
+SKU031,37.92606695541252,0,18.0,42.08662657225498,36770.80786444381,82.93748333682272,42.878692088421566,65.44211197335187,No feasible markdown reached the target sell-through; selected the feasible scenario with the highest projected sell-through.,18.0,Increase Markdown
+SKU032,24.37526551392638,25,25.0,39.959451662174395,16435.02277276486,100.0,35.97438975590236,36.62473448607362,No feasible markdown reached the target sell-through; selected the feasible scenario with the highest projected sell-through.,0.0,Keep Current Markdown
+SKU033,24.77192885635075,15,0.0,100.0,2749.0,142.868279500039,49.99090743771595,0.0,Smallest feasible markdown meeting the target sell-through.,-15.0,Reduce Markdown
+SKU034,36.947232313308426,15,0.0,45.373913530145096,37387.197270568955,106.05333829328431,53.1812725090036,33.86817361131004,Smallest feasible markdown meeting the target sell-through.,-15.0,Reduce Markdown
+SKU035,60.97864506114281,15,0.0,63.54708349041766,22751.126831239333,110.0102926407215,57.446808510638306,28.43327487747422,Smallest feasible markdown meeting the target sell-through.,-15.0,Reduce Markdown
+SKU036,64.32172725370773,15,0.0,100.0,299.0,133.3928173098372,59.919839679358724,0.0,Smallest feasible markdown meeting the target sell-through.,-15.0,Reduce Markdown
+SKU037,77.4113860136594,25,5.0,49.443628074456136,9084.574447888273,112.57026314397707,57.75391656398522,56.623136556609126,Smallest feasible markdown meeting the target sell-through.,-20.0,Reduce Markdown
+SKU038,53.355578787148204,15,0.0,100.0,289.0,134.95213635302358,57.91583166332666,0.0,Smallest feasible markdown meeting the target sell-through.,-15.0,Reduce Markdown
+SKU039,54.773125874332095,25,10.0,32.03011805317543,26406.878497641905,142.11165077443405,35.523317214162645,87.6811477114037,No feasible markdown reached the target sell-through; selected the feasible scenario with the highest projected sell-through.,-15.0,Reduce Markdown
+SKU040,23.62982182840083,15,,,0.0,,,0.0,No markdown action - no inventory available.,,No Action - No Inventory

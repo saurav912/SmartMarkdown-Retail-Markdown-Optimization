@@ -1,0 +1,12 @@
+Artifact,Purpose
+Raw Retail Dataset,Original two-year synthetic retail dataset
+Feature Engineered Dataset,Model-ready features used for forecasting
+Demand Forecast Model,Final Gradient Boosting demand forecasting pipeline
+Model Metadata,Feature names and model performance metadata
+Decision Configuration,Candidate discounts and decision constraints
+SKU Price Response,Historical SKU markdown-response information
+SKU Cluster Mapping,Behavioural segment assigned to each SKU
+Portfolio Recommendations,Latest SKU-level markdown recommendations
+Backtest Results,Historical SmartMarkdown policy simulation
+No-Replenishment Backtest,Primary comparable backtest subset
+Final KPI Summary,Final technical and business KPIs
